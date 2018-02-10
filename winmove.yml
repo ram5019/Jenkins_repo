@@ -1,0 +1,6 @@
+---
+- name: another raw module example
+  hosts: windows
+  tasks:
+     - name: Move file on remote Windows Server from one location to another
+       win_command: CMD /C "MOVE /Y C:\teststuff\myfile.conf C:\builds\smtp.conf"

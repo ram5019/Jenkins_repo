@@ -1,0 +1,9 @@
+---
+- name: reboot the windows server
+  hosts: windows
+  tasks:
+   - name: reboot
+     win_reboot:
+      shutdown_timeout_sec: 3600
+      reboot_timeout_sec: 3600
+

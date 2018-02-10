@@ -1,0 +1,9 @@
+---
+- name: install msi package
+  hosts: windows
+  tasks:
+  - name: Install an MSI, and wait for it to complete before continuing
+    win_msi:
+     path: C:\soft\7z920-x64.msi
+     wait: true
+     state: present

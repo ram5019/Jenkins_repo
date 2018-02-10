@@ -1,0 +1,21 @@
+---
+- name: create share
+  hosts: windows
+  tasks:
+  - name: Create directory structure
+    win_file:
+     path: C:\shares\company
+     state: directory
+  - name: Create file for testing
+    win_file:
+     path: C:\shares\company\test.txt
+     state: touch
+  - name: Add public company share
+    win_share:
+     name: company
+     description: top secret share
+     path: C:\shares\company
+     list: 'yes'
+     full: Administrators
+     read: training
+
