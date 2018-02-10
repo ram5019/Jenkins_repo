@@ -3,4 +3,4 @@
   hosts: localhost
   tasks:
     - name: " install the httpd"
-      raw:  "who am i"
+      raw:  uptime
