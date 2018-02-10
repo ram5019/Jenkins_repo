@@ -1,0 +1,19 @@
+---
+- name: to create tag
+  hosts: 192.168.122.50
+  tasks:
+  - name: to archive the package
+    command: tar cfz production.tar.gz /var/www/html
+    args:
+     chdir: /var/tmp
+    when: inventory_hostname in groups ['webserver']
+    tags:
+    - production
+  - name: to archinve backup server
+    command: tar cfz backup.tar.gz /var/log
+    args:
+     chdir: /var/tmp
+    when: inventory_hostname in groups ['192.168.122.50']
+    tags:
+    - 192.168.122.50
+

@@ -1,0 +1,13 @@
+---
+- name: To vsftp httpd
+  hosts: 192.168.122.50
+  become_user: student
+  tasks:
+  - name: to check package 
+    command: rpm -qa vsftpd
+    register: status
+  - name: to print JSON
+    debug: var=status
+  - name: to install package 
+    yum: name=vsftpd state=absent
+    when: status.stdout != " "

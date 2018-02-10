@@ -1,0 +1,22 @@
+---
+- name: To implement nmon in to CH3 datacentre
+  hosts: webserver
+  tasks:
+  - name: to check the status to the binary folder
+    stat: path=/usr/bin/nmon
+    register: folderstatus
+  - name: to print Json output
+    debug: var=folderstatus
+  - name: To copy the binary file if its not there
+    copy: src=/tmp/nmon dest=/usr/bin/ mode=755 owner=root group=root
+    when: folderstatus.changed == false
+  - name: to convert the file to dos2unix to remove spaces
+    command: /usr/bin/dos2unix /usr/bin/nmon
+  - name: to create directory in /root
+    file: path=/root/bin state=directory mode=0755 
+  - name: the script to the directory 
+    copy: src=/tmp/nmond.sh dest=/root/bin/ mode=0655 owner=root group=root
+  - name: to create file if it dosn't exit
+    file: path=/var/spool/cron/root state=touch owner=root group=root  
+  - name: add the scrip to crontab
+    lineinfile: path=/var/spool/cron/root line="5 0 * * * /root/bin/nmond.sh" backup=yes

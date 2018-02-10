@@ -1,0 +1,33 @@
+---
+- name: To implement nmon in to CH3 datacentre
+  hosts: 192.168.122.50
+  tasks:
+  - name: To check the status to the binary folder
+    stat: path=/usr/bin/nmon
+    register: folderstatus
+  - name: To print Json output
+    debug: var=folderstatus
+  - name: To copy the binary file if its not there to Ubuntu Distribution
+    copy: src=/tmp/nmon_x86_64_ubuntu810 dest=/usr/bin/nmon mode=755 owner=root group=root
+    when: folderstatus.changed == "false" and ansible_distribution == "Ubuntu"
+  - name: To copy the binary file if its not there to Centos distribution 
+    copy: src=/tmp/nmon dest=/usr/bin/nmon mode=755 owner=root group=root
+    when: folderstatus.changed == "false" and ansible_distribution == "CentOS"
+  - name: To create directory in /root
+    file: path=/root/bin state=directory mode=0755 
+  - name: The script to the directory 
+    copy: src=/tmp/nmond.sh dest=/root/bin/ mode=0655 owner=root group=root
+  - name: To create required directory 
+    file: path=/var/log/nmon state=directory mode=0755 group=ops mode=775 
+  - name: To create file if it dosn't exit if OS distribution  is Ubuntu 
+    command: touch /var/spool/cron/crontabs/root 
+    when: ansible_distribution == "Ubuntu"
+  - name: add the scrip to crontab if OS distribution  is Ubuntu
+    lineinfile: path=/var/spool/cron/crontabs/root line="5 0 * * * /root/bin/nmond.sh" backup=yes
+    when: ansible_distribution == "Ubuntu"
+  - name: To create file if it dosn't exit if OS distribution is Centos 
+    file: path=/var/spool/cron/root state=touch owner=root group=root
+    when: ansible_distribution == "CentOS"
+  - name: To add scheduler in crontab if OS distribution is Centos
+    lineinfile: path=/var/spool/cron/root line="5 0 * * * /root/bin/nmond.sh" regexp='nmond.sh' backup=yes 
+    when: ansible_distribution == "CentOS" 

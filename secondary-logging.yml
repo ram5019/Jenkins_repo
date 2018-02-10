@@ -1,0 +1,33 @@
+---
+- name: " To deploy the secondary logging"
+  hosts: 192.168.122.50 192.168.122.60
+  tasks:
+  - name: to created a file under /etc/profile.d/
+    file: path=/etc/profile.d/secondary-logging.sh state=touch 
+  - name: to add the flowwing lines to above created files
+    blockinfile:
+      path: /etc/profile.d/secondary-logging.sh
+      block: |
+        USER=`who am i | cut -d ' ' -f1`
+        export $USER
+  - name:  appending below line to .bashrc file
+    blockinfile:
+     path: /root/.bashrc
+     block: |
+        tags=()
+        if [ -n "$SUDO_UID" ]; then
+        tags+=("USER=$SUDO_USER($SUDO_UID)")
+        else
+        tags+=("USER=$USER($UID)")
+        fi
+        if [ -n "$SSH_CLIENT" ]; then
+        tags+=("SRC=$(echo $SSH_CLIENT | awk '{print $1}')")
+        fi
+        if [ -n "$STY" ]; then
+        tags+=("SCREEN=$STY")
+        fi
+        tag=$(IFS=, ; echo "${tags[*]}")
+        export PROMPT_COMMAND="echo \"[$tag] <\`pwd\`> \`history 1 | sed -e 's/^\s*[[:digit:]]*\s*//'\`\" | logger -p authpriv.info -t rootcmdlog"
+        unset tag
+        unset tags
+     backup: yes
